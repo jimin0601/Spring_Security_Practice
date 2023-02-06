@@ -18,8 +18,9 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class MemberService {
 
+    @Autowired
     private final MemberRepository memberRepository;
-
+    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -66,5 +67,23 @@ public class MemberService {
         Member signUpMember = new Member().toEntity(signUpDTO, password);
 
         memberRepository.save(signUpMember);
+    }
+
+    /**
+     * 로그인
+     */
+    public boolean loginMember(SignUpDTO signUpDTO) {
+
+        // 사용자가 입력한 아이디의 정보를 가져옴
+        Optional<Member> findMember = memberRepository.findById(signUpDTO.getId());
+
+        // 사용자의 입력한 정보의 비밀번호와, DB에 암호화된 패스워드랑 같은지 확인
+        boolean passwordTrue = passwordEncoder.matches(signUpDTO.getPassword(), findMember.get().getPassword());
+
+        // 틀리면 로그인 실패
+        if (!passwordTrue) return false;
+
+        // 맞으면 로그인 성공
+        else return true;
     }
 }

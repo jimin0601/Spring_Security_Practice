@@ -24,8 +24,19 @@ public class MemberController {
     public ResponseEntity<Member> memberSign(@RequestBody SignUpDTO signUpDTO) {
 
         memberService.signMember(signUpDTO);
-        System.out.println(signUpDTO);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 로그인 컨트롤러
+     */
+    @PostMapping("/login")
+    public ResponseEntity<Member> memberLogin(@RequestBody SignUpDTO signUpDTO) {
+
+        boolean login = memberService.loginMember(signUpDTO);
+
+        if(login) return new ResponseEntity<>(HttpStatus.OK);
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
