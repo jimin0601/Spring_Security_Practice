@@ -57,11 +57,16 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료기간
 
+        // JWT 토큰 생성
         return Jwts.builder()
+                // 토큰 용도
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
+                // 키랑 알고리즘 정보
                 .signWith(key, SignatureAlgorithm.HS512)
+                // 토큰 만료기간
                 .setExpiration(validity)
+                // 설정 끝내고 토큰 만들기
                 .compact();
     }
 
@@ -69,8 +74,10 @@ public class TokenProvider implements InitializingBean {
         Toke에 담겨있는 정보를 이용해 Authentication 객체를 반환하는 메서드
      */
 
-    public Authentication getAuthentication(String token {
+    public Authentication getAuthentication(String token) {
         Claims claims = Jwts
+                // parserBuilder 를 생성한 뒤, 토큰 값을 넣어서 Jws 를 생성합니다.
+                // Jws 를 생성하면 메소드를 이용해서 토큰 내부의 값을 parse 해서 가져올 수 있습니다.
                 .parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -80,6 +87,7 @@ public class TokenProvider implements InitializingBean {
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
+                        // 리스트 타입으로 반환
                         .collect(Collectors.toList());
 
         User principal = new User(claims.getSubject(), "", authorities);
